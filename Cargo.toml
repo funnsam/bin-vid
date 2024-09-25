@@ -1,3 +1,6 @@
+[workspace]
+members = ["bin-vid-gen", "bin-vid-viewer"]
+
 [package]
 name = "bin-vid"
 version = "0.1.0"

@@ -1,0 +1,7 @@
+[package]
+name = "bin-vid-viewer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bin-vid = { version = "0.1.0", path = ".." }

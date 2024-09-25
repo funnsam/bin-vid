@@ -1,0 +1,8 @@
+[package]
+name = "bin-vid-gen"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bin-vid = { version = "0.1.0", path = ".." }
+gif = "0.13.1"

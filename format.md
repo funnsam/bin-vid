@@ -1,8 +1,7 @@
 # File structure
 ## Header
-- 2 bytes: width - 1
-- 2 bytes: height - 1
-- Variable: no. of frames
+- 2 bytes (LE): width - 1
+- 2 bytes (LE): height - 1
 - Variable: frame contents
 
 ## Frame
