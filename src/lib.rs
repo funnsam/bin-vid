@@ -2,15 +2,22 @@ use std::io;
 
 mod utils;
 
-pub fn encode_video<'a, S: 'a + Iterator<Item = Box<[bool]>>>(size: (u16, u16), stream: S) -> Vec<u8> {
+pub struct VideoInfo {
+    pub width: u16,
+    pub height: u16,
+    pub fps: u16,
+}
+
+pub fn encode_video<'a, S: 'a + Iterator<Item = Box<[bool]>>>(info: VideoInfo, stream: S) -> Vec<u8> {
     let mut bits = utils::BitsWriter::new();
-    bits.write_u16_aligned(size.0);
-    bits.write_u16_aligned(size.1);
+    bits.write_u16_aligned(info.width);
+    bits.write_u16_aligned(info.height);
+    bits.write_u16_aligned(info.fps);
 
     let mut last_frame: Option<Box<[bool]>> = None;
 
     for frame in stream {
-        assert_eq!(frame.len(), size.0 as usize * size.1 as usize);
+        assert_eq!(frame.len(), info.width as usize * info.height as usize);
 
         if let Some(last) = last_frame {
             if size_of_p_frame(&last, &frame) < size_of_i_frame(&frame) {
@@ -115,19 +122,20 @@ pub struct Decoder<R: io::Read> {
 }
 
 impl<R: io::Read> Decoder<R> {
-    pub fn new(mut reader: R) -> Result<(Self, (u16, u16)), io::Error> {
-        let mut buf = [0; 4];
+    pub fn new(mut reader: R) -> Result<(Self, VideoInfo), io::Error> {
+        let mut buf = [0; 6];
         reader.read_exact(&mut buf)?;
 
         let width = buf[0] as u16 | ((buf[1] as u16) << 8);
         let height = buf[2] as u16 | ((buf[3] as u16) << 8);
+        let fps = buf[4] as u16 | ((buf[5] as u16) << 8);
         let frame_size = width as usize * height as usize;
 
         Ok((Self {
             reader: utils::BitStream::new(reader),
             last_frame: vec![false; frame_size].into(),
             frame_size,
-        }, (width, height)))
+        }, VideoInfo { width, height, fps }))
     }
 }
 

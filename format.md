@@ -2,6 +2,7 @@
 ## Header
 - 2 bytes (LE): width - 1
 - 2 bytes (LE): height - 1
+- 2 bytes (LE): video FPS
 - Variable: frame contents
 
 ## Frame

@@ -3,10 +3,14 @@ fn main() {
     decoder.set_color_output(gif::ColorOutput::RGBA);
 
     let file = std::fs::File::open(std::env::args().nth(1).unwrap()).unwrap();
-    let decoder = decoder.read_info(file).unwrap();
+    let mut decoder = decoder.read_info(file).unwrap();
 
-    let size = (decoder.width(), decoder.height());
-    let result = bin_vid::encode_video(size, FrameStream(decoder));
+    let vid = bin_vid::VideoInfo {
+        width: decoder.width(),
+        height: decoder.height(),
+        fps: 1000 / decoder.next_frame_info().unwrap().unwrap().delay.max(100),
+    };
+    let result = bin_vid::encode_video(vid, FrameStream(decoder));
 
     println!("Compressed to {} bytes", result.len());
     std::fs::write("video.bin", result).unwrap();
